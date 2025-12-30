@@ -1,7 +1,6 @@
 # python
 
 fresh_ranges = []
-fresh_sets = []
 total_fresh_IDs = 0
 with open('Day05/db-actual.txt', 'r') as file:
     for line in file:
@@ -17,22 +16,26 @@ with open('Day05/db-actual.txt', 'r') as file:
 fresh_ranges.sort()
 print(f"Fresh ranges: {fresh_ranges}")
 
-this_fresh_set = set()
+this_range_max = -1
+this_range = []
+total_fresh_IDs = 0
 for fresh_range in fresh_ranges:
-    if not this_fresh_set:
-        this_fresh_set.update(range(fresh_range[0], fresh_range[1] + 1))
+    if this_range == []:
+        this_range = [fresh_range[0], fresh_range[1]]
+        this_range_max = fresh_range[1]
+    if fresh_range[0] > this_range_max + 1:
+        print(f"Gap detected before range: {fresh_range}")
+        print(f"Finalized fresh ID set: {this_range}")
+        total_fresh_IDs += this_range[1] - this_range[0] + 1
+        this_range = [fresh_range[0], fresh_range[1]]
+        this_range_max = fresh_range[1]
     else:
-        if fresh_range[0] <= max(this_fresh_set) + 1:
-            this_fresh_set.update(range(fresh_range[0], fresh_range[1] + 1))
-            print(f"Merged fresh ID set: {this_fresh_set}")
-        else:
-            fresh_sets.append(this_fresh_set)
-            print(f"Finalized fresh ID set: {this_fresh_set}")
-            this_fresh_set = set()
-            this_fresh_set.update(range(fresh_range[0], fresh_range[1] + 1))
-fresh_sets.append(this_fresh_set)
-print(f"Finalized fresh ID set: {this_fresh_set}")
+        if fresh_range[1] > this_range_max:
+            this_range_max = fresh_range[1]
+            this_range[1] = fresh_range[1]
+if this_range != []:
+    print(f"Finalized fresh ID set: {this_range}")
+    total_fresh_IDs += this_range[1] - this_range[0] + 1
 
-for fresh_set in fresh_sets:
-    total_fresh_IDs += len(fresh_set)
+
 print(f"Total fresh IDs: {total_fresh_IDs}")
