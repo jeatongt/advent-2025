@@ -1,19 +1,22 @@
 # python
 import pprint
 
-def is_a_beam(x, y, manifold):
-    if manifold[y][x] == '|':
-        return True
+beam_paths = [] # This list will hold all the possible paths that beams might take
+def initialize_beam_paths(manifold):
+    for y in range(len(manifold)):
+        for x in range(len(manifold[0])):
+            if is_a_source(x, y, manifold):
+                this_path = [(x, y)]
+                beam_paths.append(this_path)
+    return beam_paths
+
+def is_a_source(x, y, manifold):
     if manifold[y][x] == 'S':
         return True
     return False
 
 def is_a_splitter(x, y, manifold):
     if manifold[y][x] == '^':
-        return True
-    if manifold[y][x] == '/':
-        return True
-    if manifold[y][x] == 'l':
         return True
     return False
 
@@ -22,42 +25,26 @@ def beam_splits_next_row(x, y, manifold):
         return False
     return is_a_splitter(x, y+1, manifold)
 
-def split_beam_next_row(x, y, manifold, split_already_this_iteration):
-    if manifold[y+1][x] == '^' and split_already_this_iteration == 0:
-        manifold[y+1][x-1] = '|'
-        manifold[y+1][x] = '/'
-        return 1
-    elif manifold[y+1][x] == '/' and split_already_this_iteration == 0:
-        manifold[y+1][x+1] = '|'
-        manifold[y+1][x] = 'l'
-        return 1
-    else:
-        return 0
-
-def continue_beam_next_row(x, y, manifold):
+def advance_beam_path(path, manifold):
+    x, y = path[-1]
     if y == len(manifold) - 1:
         return
-    manifold[y+1][x] = '|'
+    if beam_splits_next_row(x, y, manifold):
+        path.append((x-1, y+1))
+        right_path = path + [(x+1, y+1)]
+        advance_beam_path(path, manifold)
+        beam_paths.append(right_path)
+        advance_beam_path(right_path, manifold)
+    else:
+        path.append((x, y+1))
+        advance_beam_path(path, manifold)
 
 def analyze_beam_path(manifold):
-    last_timeline_splits = -1
-    timeline_splits = 0
-    split_this_iteration = 0
-    while timeline_splits != last_timeline_splits:
-        last_timeline_splits = timeline_splits
-        print(f"Manifold so far with {timeline_splits} splits:")
-        pprint.pprint(manifold)
-        for y in range(len(manifold)):
-            for x in range(len(manifold[0])):
-                if is_a_beam(x, y, manifold):
-                    if beam_splits_next_row(x, y, manifold):
-                        split_this_iteration += split_beam_next_row(x, y, manifold, split_this_iteration)
-                    else:
-                        continue_beam_next_row(x, y, manifold)
-        if split_this_iteration > 0:
-            timeline_splits += 1
-            split_this_iteration = 0
-    return timeline_splits
+    beam_paths = initialize_beam_paths(manifold)
+    for path in beam_paths:
+        advance_beam_path(path, manifold)
+    return len(beam_paths)
+
 
 manifold = []
 with open('Day07/manifold-test.txt', 'r') as file:
@@ -65,4 +52,5 @@ with open('Day07/manifold-test.txt', 'r') as file:
         manifold_line = list(line.strip())
         manifold.append(manifold_line)
 total_timeline_splits = analyze_beam_path(manifold)
-print(f"Total timeline splits: {total_timeline_splits}")
+print(f"Total beam paths: {total_timeline_splits}")
+# pprint.pprint(beam_paths)
