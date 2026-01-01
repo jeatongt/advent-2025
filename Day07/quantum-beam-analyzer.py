@@ -27,6 +27,7 @@ def beam_splits_next_row(x, y, manifold):
 
 def advance_beam_path(path, manifold):
     x, y = path[-1]
+    print(f"y == {y}, Beams so far:", len(beam_paths))
     if y == len(manifold) - 1:
         return
     if beam_splits_next_row(x, y, manifold):
