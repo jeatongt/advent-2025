@@ -21,9 +21,9 @@ def beam_splits_next_row(x, y, manifold):
     return is_a_splitter(x, y+1, manifold)
 
 def split_beam_next_row(x, y, manifold):
-    manifold[y][x] = str(int(manifold[y][x]) - 1)
-    manifold[y+1][x-1] = str(int(manifold[y+1][x-1]) + 1)
-    manifold[y+1][x+1] = str(int(manifold[y+1][x+1]) + 1)
+    manifold[y+1][x-1] = str(int(manifold[y+1][x-1]) + int(manifold[y][x]))
+    manifold[y+1][x+1] = str(int(manifold[y+1][x+1]) + int(manifold[y][x]))
+    manifold[y][x] = '0'
 
 def continue_beam_next_row(x, y, manifold):
     if y == len(manifold) - 1:
@@ -32,8 +32,8 @@ def continue_beam_next_row(x, y, manifold):
         manifold[y][x] = '0'
         manifold[y+1][x] = '1'
         return
-    manifold[y+1][x] = str(int(manifold[y+1][x]) + 1)
-    manifold[y][x] = str(int(manifold[y][x]) - 1)
+    manifold[y+1][x] = str(int(manifold[y+1][x]) + int(manifold[y][x]))
+    manifold[y][x] = '0'
 
 def add_counts_to_manifold(manifold):
     for y in range(len(manifold)):
@@ -60,7 +60,7 @@ def analyze_beam_path(manifold):
                     continue_beam_next_row(x, y, manifold)
 
 manifold = []
-with open('Day07/manifold-test.txt', 'r') as file:
+with open('Day07/manifold-actual.txt', 'r') as file:
     for line in file:
         manifold_line = list(line.strip())
         manifold.append(manifold_line)
