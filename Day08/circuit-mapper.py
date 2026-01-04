@@ -28,11 +28,13 @@ for junction1 in junctions:
 sorted_distances = sorted(distances, key=lambda x: x[2])
 distances = sorted_distances
 # Build circuitsn from n closest junctions
-n = 1
+# n = 1
+last_junction1 = None
+last_junction2 = None
 for dist in distances:
-    if n > 2000: # doubled because each junction appears twice in distances
-        break
-    n += 1
+    # if n > 2000: # doubled because each junction appears twice in distances
+    #     break
+    # n += 1
     junction1, junction2, dist_value = dist
     circuit1 = None
     circuit2 = None
@@ -45,8 +47,16 @@ for dist in distances:
         # Merge circuits
         circuit1.extend(circuit2)
         circuits.remove(circuit2)
+        if len(circuits) == 1:
+            last_junction1 = junction1
+            last_junction2 = junction2
+            break
 list_lengths = [len(circuit) for circuit in circuits]
 sorted_lengths = sorted(list_lengths, reverse=True)
-print("Lengths of circuits (largest to smallest):", sorted_lengths)
+# print("Lengths of circuits (largest to smallest):", sorted_lengths)
 # pprint.pprint(junctions)
 # pprint.pprint(circuits)
+print("Last junctions connected to complete the circuit:")
+print(last_junction1)
+print(last_junction2)
+print(last_junction1[0] * last_junction2[0])
